@@ -16,7 +16,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public boolean addTransaction(Transaction transaction, long currentTimestamp) {
-        if (transaction.getTimestamp() >= this.getLastMinute(currentTimestamp)) {
+        if (this.isInTheLastMinute(transaction.getTimestamp(), currentTimestamp)) {
             this.repository.addTransaction(transaction);
             return true;
         }
@@ -29,8 +29,12 @@ public class TransactionServiceImpl implements TransactionService {
         List<Transaction> transactions = this.repository
                 .getTransactions()
                 .stream()
-                .filter(t -> t.getTimestamp() >= this.getLastMinute(currentTimestamp))
+                .filter(t -> this.isInTheLastMinute(t.getTimestamp(), currentTimestamp))
                 .collect(Collectors.toList());
+
+        if (transactions.isEmpty()) {
+            return new Statistics();
+        }
 
         double sum = transactions.stream().map(Transaction::getAmount).reduce(0d, Double::sum);
         double avg = transactions.stream().mapToDouble(Transaction::getAmount).average().getAsDouble();
@@ -41,7 +45,7 @@ public class TransactionServiceImpl implements TransactionService {
         return new Statistics(sum, avg, max, min, count);
     }
 
-    private long getLastMinute(long currentTimestamp) {
-        return currentTimestamp - 60_000;
+    private boolean isInTheLastMinute(long timestamp, long currentTimestamp) {
+        return timestamp >= currentTimestamp - 60_000 && timestamp <= currentTimestamp;
     }
 }
