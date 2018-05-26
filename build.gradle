@@ -28,6 +28,10 @@ allprojects {
         jcenter()
         mavenCentral()
     }
+
+    dependencies {
+        testCompile "org.springframework.boot:spring-boot-starter-test"
+    }
 }
 
 dependencies {
@@ -41,7 +45,6 @@ subprojects {
         compile "org.springframework:spring-context"
 
         testCompile "org.mockito:mockito-core:2.+"
-        testCompile "org.springframework.boot:spring-boot-starter-test"
     }
 }
 
