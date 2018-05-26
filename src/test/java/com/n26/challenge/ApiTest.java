@@ -81,6 +81,22 @@ public class ApiTest {
     }
 
     @Test
+    public void addTInvalidTransactionErrorTest() throws Exception {
+        assertEquals(0, this.repository.getTransactions().size());
+
+        JSONObject request = new JSONObject()
+                .put("amount", -32.98)
+                .put("timestamp", -1);
+
+        this.mockMvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request.toString()))
+                .andExpect(status().isBadRequest());
+
+        assertEquals(0, this.repository.getTransactions().size());
+    }
+
+    @Test
     public void getStatisticsSuccessfullyTest() throws Exception {
         this.repository.addTransaction(new Transaction(10.25, getCurrentTimestamp()));
         this.repository.addTransaction(new Transaction(23.57, getCurrentTimestamp()));

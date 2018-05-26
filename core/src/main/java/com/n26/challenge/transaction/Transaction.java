@@ -1,5 +1,8 @@
 package com.n26.challenge.transaction;
 
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -10,17 +13,26 @@ public class Transaction {
         return BigDecimal.valueOf(timestamp).divide(BigDecimal.valueOf(1_000), 0, RoundingMode.UP).intValue();
     }
 
+    @Min(1)
     private long id;
+
+    @NotNull
+    @DecimalMin("0.0")
     private double amount;
+
+    @NotNull
+    @Min(0)
     private long timestamp;
 
-    public Transaction() {}
-
-    public Transaction(double amount, long timestamp) {
-        this.amount = amount;
-        this.timestamp = timestamp;
+    public Transaction() {
         this.id = ID_GENERATOR;
         ID_GENERATOR += 1;
+    }
+
+    public Transaction(double amount, long timestamp) {
+        this();
+        this.amount = amount;
+        this.timestamp = timestamp;
     }
 
     public long getId() {
