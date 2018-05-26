@@ -1,6 +1,16 @@
 package com.n26.challenge.transaction;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class Transaction {
+    private static long ID_GENERATOR = 1;
+
+    static int calculateHash(long timestamp) {
+        return BigDecimal.valueOf(timestamp).divide(BigDecimal.valueOf(1_000), 0, RoundingMode.UP).intValue();
+    }
+
+    private long id;
     private double amount;
     private long timestamp;
 
@@ -9,6 +19,12 @@ public class Transaction {
     public Transaction(double amount, long timestamp) {
         this.amount = amount;
         this.timestamp = timestamp;
+        this.id = ID_GENERATOR;
+        ID_GENERATOR += 1;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public double getAmount() {
@@ -25,5 +41,18 @@ public class Transaction {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || this.getClass() != o.getClass()) return false;
+        Transaction that = (Transaction) o;
+        return this.id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return calculateHash(this.timestamp);
     }
 }

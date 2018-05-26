@@ -2,9 +2,10 @@ package com.n26.challenge.transaction;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -16,7 +17,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public boolean addTransaction(Transaction transaction, long currentTimestamp) {
-        if (this.isInTheLastMinute(transaction.getTimestamp(), currentTimestamp)) {
+        if (transaction.getTimestamp() >= currentTimestamp - 60_000 && transaction.getTimestamp() <= currentTimestamp) {
             this.repository.addTransaction(transaction);
             return true;
         }
@@ -26,11 +27,16 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Statistics getStatistics(long currentTimestamp) {
-        List<Transaction> transactions = this.repository
-                .getTransactions()
-                .stream()
-                .filter(t -> this.isInTheLastMinute(t.getTimestamp(), currentTimestamp))
-                .collect(Collectors.toList());
+        int hash = Transaction.calculateHash(currentTimestamp);
+        Map<Integer, List<Transaction>> transactionsMap = this.repository.getTransactions();
+
+        List<Transaction> transactions = new ArrayList<>();
+
+        for (int i = 0; i < 60; i++) {
+            if (transactionsMap.containsKey(hash - i)) {
+                transactions.addAll(transactionsMap.get(hash - i));
+            }
+        }
 
         if (transactions.isEmpty()) {
             return new Statistics();
@@ -43,9 +49,5 @@ public class TransactionServiceImpl implements TransactionService {
         long count = transactions.size();
 
         return new Statistics(sum, avg, max, min, count);
-    }
-
-    private boolean isInTheLastMinute(long timestamp, long currentTimestamp) {
-        return timestamp >= currentTimestamp - 60_000 && timestamp <= currentTimestamp;
     }
 }
