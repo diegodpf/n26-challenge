@@ -31,6 +31,8 @@ allprojects {
 }
 
 dependencies {
+    compile project(":api")
+
     compile "org.springframework.boot:spring-boot-starter"
 }
 

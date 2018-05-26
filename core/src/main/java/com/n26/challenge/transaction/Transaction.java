@@ -1,8 +1,10 @@
 package com.n26.challenge.transaction;
 
 public class Transaction {
-    private final double amount;
-    private final long timestamp;
+    private double amount;
+    private long timestamp;
+
+    public Transaction() {}
 
     public Transaction(double amount, long timestamp) {
         this.amount = amount;
@@ -10,10 +12,18 @@ public class Transaction {
     }
 
     public double getAmount() {
-        return this.amount;
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 
     public long getTimestamp() {
-        return this.timestamp;
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

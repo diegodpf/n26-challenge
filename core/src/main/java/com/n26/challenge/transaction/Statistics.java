@@ -15,6 +15,10 @@ public class Statistics {
         this.count = count;
     }
 
+    public Statistics() {
+        this(0, 0, 0, 0, 0);
+    }
+
     public double getSum() {
         return this.sum;
     }
