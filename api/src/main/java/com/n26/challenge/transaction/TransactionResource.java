@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static com.n26.challenge.utils.DateUtils.getCurrentTimestamp;
 
 @RestController
@@ -16,7 +18,7 @@ public class TransactionResource {
     private TransactionService transactionService;
 
     @PostMapping("/transactions")
-    public ResponseEntity<Void> addTransaction(@RequestBody Transaction transaction) {
+    public ResponseEntity<Void> addTransaction(@RequestBody @Valid Transaction transaction) {
         boolean success = this.transactionService.addTransaction(transaction, getCurrentTimestamp());
 
         return  ResponseEntity.status(success ? HttpStatus.CREATED : HttpStatus.NO_CONTENT).build();

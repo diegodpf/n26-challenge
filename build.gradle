@@ -30,6 +30,7 @@ allprojects {
     }
 
     dependencies {
+        compile "javax.validation:validation-api"
         testCompile "org.springframework.boot:spring-boot-starter-test"
     }
 }
