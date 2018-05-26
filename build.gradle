@@ -21,6 +21,7 @@ allprojects {
     apply plugin: 'java'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'jacoco'
+
     sourceCompatibility = 1.8
 
     repositories {
@@ -31,8 +32,6 @@ allprojects {
 
 dependencies {
     compile "org.springframework.boot:spring-boot-starter"
-    compile "org.springframework.boot:spring-boot-starter-web"
-    testCompile "org.springframework.boot:spring-boot-starter-test"
 }
 
 subprojects {
@@ -59,6 +58,4 @@ task codeCoverageReport(type: JacocoReport) {
     }
 }
 
-codeCoverageReport.dependsOn {
-    subprojects*.test
-}
+codeCoverageReport.dependsOn = subprojects*.test
