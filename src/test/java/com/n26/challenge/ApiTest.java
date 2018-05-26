@@ -82,21 +82,71 @@ public class ApiTest {
 
     @Test
     public void getStatisticsSuccessfullyTest() throws Exception {
-        this.repository.addTransaction(new Transaction(1, getCurrentTimestamp()));
-        this.repository.addTransaction(new Transaction(2, getCurrentTimestamp()));
-        this.repository.addTransaction(new Transaction(3, getCurrentTimestamp()));
-        this.repository.addTransaction(new Transaction(4, getCurrentTimestamp()));
-        this.repository.addTransaction(new Transaction(5, getCurrentTimestamp()));
+        this.repository.addTransaction(new Transaction(10.25, getCurrentTimestamp()));
+        this.repository.addTransaction(new Transaction(23.57, getCurrentTimestamp()));
+        this.repository.addTransaction(new Transaction(36.34, getCurrentTimestamp()));
+        this.repository.addTransaction(new Transaction(4.76, getCurrentTimestamp()));
+        this.repository.addTransaction(new Transaction(5.77, getCurrentTimestamp()));
         this.repository.addTransaction(new Transaction(6, getCurrentTimestamp() - 61_000));
 
         MvcResult result = this.mockMvc.perform(get("/statistics")).andExpect(status().isOk()).andReturn();
 
         JSONObject response = new JSONObject(result.getResponse().getContentAsString());
 
-        assertEquals(15, response.getDouble("sum"), 0);
-        assertEquals(3, response.getDouble("avg"), 0);
-        assertEquals(5, response.getDouble("max"), 0);
-        assertEquals(1, response.getDouble("min"), 0);
+        assertEquals(80.69, response.getDouble("sum"), 0);
+        assertEquals(16.14, response.getDouble("avg"), 0);
+        assertEquals(36.34, response.getDouble("max"), 0);
+        assertEquals(4.76, response.getDouble("min"), 0);
         assertEquals(5, response.getInt("count"));
+    }
+
+    @Test
+    public void getStatisticsWithTimeDelaySuccessfullyTest() throws Exception {
+        this.repository.addTransaction(new Transaction(10, getCurrentTimestamp()));
+
+        MvcResult result1 = this.mockMvc.perform(get("/statistics")).andExpect(status().isOk()).andReturn();
+        JSONObject r1 = new JSONObject(result1.getResponse().getContentAsString());
+
+        assertEquals(10, r1.getDouble("sum"), 0);
+        assertEquals(10, r1.getDouble("avg"), 0);
+        assertEquals(10, r1.getDouble("max"), 0);
+        assertEquals(10, r1.getDouble("min"), 0);
+        assertEquals(1, r1.getInt("count"));
+
+        Thread.sleep(30_000);
+
+        this.repository.addTransaction(new Transaction(20, getCurrentTimestamp()));
+
+        MvcResult result2 = this.mockMvc.perform(get("/statistics")).andExpect(status().isOk()).andReturn();
+        JSONObject r2 = new JSONObject(result2.getResponse().getContentAsString());
+
+        assertEquals(30, r2.getDouble("sum"), 0);
+        assertEquals(15, r2.getDouble("avg"), 0);
+        assertEquals(20, r2.getDouble("max"), 0);
+        assertEquals(10, r2.getDouble("min"), 0);
+        assertEquals(2, r2.getInt("count"));
+
+        Thread.sleep(30_000);
+        this.repository.addTransaction(new Transaction(30, getCurrentTimestamp()));
+
+        MvcResult result3 = this.mockMvc.perform(get("/statistics")).andExpect(status().isOk()).andReturn();
+        JSONObject r3 = new JSONObject(result3.getResponse().getContentAsString());
+
+        assertEquals(50, r3.getDouble("sum"), 0);
+        assertEquals(25, r3.getDouble("avg"), 0);
+        assertEquals(30, r3.getDouble("max"), 0);
+        assertEquals(20, r3.getDouble("min"), 0);
+        assertEquals(2, r3.getInt("count"));
+
+        Thread.sleep(60_000);
+
+        MvcResult result4 = this.mockMvc.perform(get("/statistics")).andExpect(status().isOk()).andReturn();
+        JSONObject r4 = new JSONObject(result4.getResponse().getContentAsString());
+
+        assertEquals(0, r4.getDouble("sum"), 0);
+        assertEquals(0, r4.getDouble("avg"), 0);
+        assertEquals(0, r4.getDouble("max"), 0);
+        assertEquals(0, r4.getDouble("min"), 0);
+        assertEquals(0, r4.getInt("count"));
     }
 }
