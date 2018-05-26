@@ -1,0 +1,6 @@
+*.iws
+out/
+.idea/
+*.iml
+gradle/
+.idea_modules/
