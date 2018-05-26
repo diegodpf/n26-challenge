@@ -2,10 +2,9 @@ package com.n26.challenge.transaction;
 
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -43,10 +42,10 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         double sum = transactions.stream().map(Transaction::getAmount).reduce(0d, Double::sum);
-        double avg = transactions.stream().mapToDouble(Transaction::getAmount).average().getAsDouble();
-        double max = transactions.stream().map(Transaction::getAmount).max(Comparator.naturalOrder()).get();
-        double min = transactions.stream().map(Transaction::getAmount).min(Comparator.naturalOrder()).get();
         long count = transactions.size();
+        double avg = BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP).doubleValue();
+        double max = Collections.max(transactions, Comparator.comparingDouble(Transaction::getAmount)).getAmount();
+        double min = Collections.min(transactions, Comparator.comparingDouble(Transaction::getAmount)).getAmount();
 
         return new Statistics(sum, avg, max, min, count);
     }
